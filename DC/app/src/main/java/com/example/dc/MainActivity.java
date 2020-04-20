@@ -1,15 +1,22 @@
 package com.example.dc;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.TextView;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -20,8 +27,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private long lastUpdate = 0;
     private long lastUpdate_gyro = 0;
-    private float lastX=0, lastY=0,lastZ=0;
-    private static final int SHAKE_THRESHOLD=1;
+    private float lastX = 0, lastY = 0, lastZ = 0;
+    private static final int SHAKE_THRESHOLD = 1;
+    public int MYLOCATION;
 
 
     @Override
@@ -31,13 +39,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManagers = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometor = sensorManagers.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManagers.registerListener(this, senAccelerometor , SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManagers.registerListener(this, senAccelerometor, SensorManager.SENSOR_DELAY_NORMAL);
 
         senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        sensorManagers.registerListener(this, senGyroscope , SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
 
-//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        loationGetter = locationManager.getAllProviders(Context.)
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+////        LocationListener locationListener = new
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MYLOCATION );
+//            return;
+//        }
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 
 
     }
@@ -51,6 +65,38 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         sensorManagers.registerListener(this, senAccelerometor , SensorManager.SENSOR_DELAY_NORMAL);
     }
+
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+
+            String longitude = "" + location.getLongitude();
+            TextView text = (TextView) findViewById(R.id.gpsx);
+            text.setText(longitude);
+
+            String latitude = "" + location.getLatitude();
+            text = (TextView) findViewById(R.id.gpsy);
+            text.setText(latitude);
+
+
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -143,3 +189,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 }
+
+
