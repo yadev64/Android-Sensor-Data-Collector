@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -281,6 +283,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    public void startAnimate(){
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
+        ObjectAnimator pbAnim = ObjectAnimator.ofFloat(pb, "progress", 100.0F, 0.0F);
+        pbAnim.setDuration(300000);
+        pbAnim.setInterpolator(new LinearInterpolator());
+        pbAnim.start();
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -337,7 +346,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 text.setText(sX);
 
                     ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-                    int progress = (int) ((-1 * x) + 10);
+                    int progress = (int) (((-1 * x) + 10) * 10000);
+                    startAnimate();
                     progressBar.setProgress(progress);
 
                 String sY = Float.toString(y);
