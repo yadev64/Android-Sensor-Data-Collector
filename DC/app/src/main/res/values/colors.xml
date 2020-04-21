@@ -10,7 +10,7 @@
     <color name="dark_mode_bg">#000000</color>
 
     <color name="lite_mode_Text_main">#000000</color>
-    <color name="lite_mode_Text_sub">#03dac5</color>
-    <color name="lite_mode_card">#ffffff</color>
-    <color name="lite_mode_bg">#a0c2c2</color>
+    <color name="lite_mode_Text_sub">#2196f3</color>
+    <color name="lite_mode_card">#FFFFFF</color>
+    <color name="lite_mode_bg">#FFFFFF</color>
 </resources>
