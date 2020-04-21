@@ -17,6 +17,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -334,6 +335,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     String sX = Float.toString(x);
                 TextView text = (TextView) findViewById(R.id.ax);
                 text.setText(sX);
+
+                    ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+                    int progress = (int) ((-1 * x) + 10);
+                    progressBar.setProgress(progress);
 
                 String sY = Float.toString(y);
                 text = (TextView) findViewById(R.id.ay);
