@@ -18,8 +18,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -53,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         MyFusedLocationClient= LocationServices.getFusedLocationProviderClient(this);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         sensorManagers = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometor = sensorManagers.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -68,6 +72,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         else {
             Toast.makeText(getApplicationContext(), "Location Permission Granted", Toast.LENGTH_SHORT);
         }
+
+        Switch toggle = (Switch) findViewById(R.id.sw);
+        toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked){
+                onResume();
+            }
+            else{
+                onPause();
+            }
+        });
 
 ////        LocationListener locationListener = new
 //        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -96,6 +110,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     }
+
+//    protected void onToggle(){
+//        ToggleButton toggle = (ToggleButton) findViewById(R.id.sw);
+//        toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                if (isChecked){
+//                    onResume();
+//                }
+//                else{
+//                    onPause();
+//                }
+//            }
+//        });
+//    }
 
     protected void onPause(){
         super.onPause();
