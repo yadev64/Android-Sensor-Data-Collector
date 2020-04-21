@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public int MYLOCATION;
     private int locationRequestCode=1000;
     private double wayLatitude = 0.0, wayLongitude = 0.0;
+    public int i=0;
 
 
     @Override
@@ -61,10 +62,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManagers = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         senAccelerometor = sensorManagers.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManagers.registerListener(this, senAccelerometor, SensorManager.SENSOR_DELAY_NORMAL);
+//        sensorManagers.registerListener(this, senAccelerometor, SensorManager.SENSOR_DELAY_NORMAL);   //Important
 
         senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+//        sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);       //Important
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
@@ -76,9 +77,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Switch toggle = (Switch) findViewById(R.id.sw);
         toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked){
+                i=1;
                 onResume();
             }
             else{
+                i=0;
                 onPause();
             }
         });
@@ -133,8 +136,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void onResume(){
         super.onResume();
-        sensorManagers.registerListener(this, senAccelerometor , SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        if(i==1) {
+            sensorManagers.registerListener(this, senAccelerometor, SensorManager.SENSOR_DELAY_NORMAL);
+            sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
 //    LocationListener locationListener = new LocationListener() {
@@ -169,12 +174,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        }
 //    };
 
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-
-        Sensor mySensor = sensorEvent.sensor;
-        Sensor GSensor = sensorEvent.sensor;
-
+    public void GetNewLocation(){
+        MyFusedLocationClient.flushLocations();
         MyFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if(location!=null){
                 wayLatitude = location.getLatitude();
@@ -190,6 +191,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 GPS_loc.setText(String.format(Locale.US,"%s -- %s", wayLatitude, wayLongitude));
             }
         });
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        Sensor mySensor = sensorEvent.sensor;
+        Sensor GSensor = sensorEvent.sensor;
+//        GetNewLocation();
+//        MyFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+//            if(location!=null){
+//                wayLatitude = location.getLatitude();
+//                wayLongitude = location.getLongitude();
+//
+//                GPSx = (TextView) findViewById(R.id.gpsx);
+//                GPSx.setText("" + wayLatitude);
+//
+//                GPSy = (TextView) findViewById(R.id.gpsy);
+//                GPSy.setText("" + wayLongitude);
+//
+//                GPS_loc = (TextView) findViewById(R.id.city);
+//                GPS_loc.setText(String.format(Locale.US,"%s -- %s", wayLatitude, wayLongitude));
+//            }
+//        });
 
         if (GSensor.getType()==Sensor.TYPE_GYROSCOPE){
             float gx = sensorEvent.values[0];
@@ -202,6 +226,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 lastUpdate_gyro = currentTime;
 
                 {
+                    GetNewLocation();                                   //Just to update the location ;P
+
+
                     String sX = Float.toString(gx);
                     TextView text = (TextView) findViewById(R.id.gx);
                     text.setText(sX);
