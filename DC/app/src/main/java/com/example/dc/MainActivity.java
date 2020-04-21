@@ -21,6 +21,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private long lastUpdate_gyro = 0;
     private float lastX = 0, lastY = 0, lastZ = 0;
     private static final int SHAKE_THRESHOLD = 1;
+    private FusedLocationProviderClient MyFusedLocation;
     public int MYLOCATION;
 
 
@@ -57,18 +60,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //            return;
 //        }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
-
-                Toast.makeText(getApplicationContext(), "Error getting permissions", Toast.LENGTH_SHORT);
-            }else {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, MYLOCATION);
-            }
 
 
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, (LocationListener) this);
+        //NEW
+
+
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+//
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+//
+//                Toast.makeText(getApplicationContext(), "Error getting permissions", Toast.LENGTH_SHORT);
+//            }else {
+//                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, MYLOCATION);
+//            }
+//
+//
+//        }
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, (LocationListener) this);
 
 
     }
