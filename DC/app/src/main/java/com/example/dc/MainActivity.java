@@ -22,6 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -30,19 +33,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor senAccelerometor;
     private Sensor senGyroscope;
     private LocationManager locationManager;
+    private TextView GPSx;
+    private TextView GPSy;
+    private TextView GPS_loc;
 
     private long lastUpdate = 0;
     private long lastUpdate_gyro = 0;
     private float lastX = 0, lastY = 0, lastZ = 0;
     private static final int SHAKE_THRESHOLD = 1;
-    private FusedLocationProviderClient MyFusedLocation;
+    private FusedLocationProviderClient MyFusedLocationClient;
     public int MYLOCATION;
+    private int locationRequestCode=1000;
+    private double wayLatitude = 0.0, wayLongitude = 0.0;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MyFusedLocationClient= LocationServices.getFusedLocationProviderClient(this);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -52,6 +61,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         sensorManagers.registerListener(this, senGyroscope, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Location Permission Granted", Toast.LENGTH_SHORT);
+        }
 
 ////        LocationListener locationListener = new
 //        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -91,43 +107,59 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManagers.registerListener(this, senAccelerometor , SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
+//    LocationListener locationListener = new LocationListener() {
+//        @Override
+//        public void onLocationChanged(Location location) {
+//
+//            String longitude = "" + location.getLongitude();
+//            TextView text = (TextView) findViewById(R.id.gpsx);
+//            text.setText(longitude);
+//
+//            String latitude = "" + location.getLatitude();
+//            text = (TextView) findViewById(R.id.gpsy);
+//            text.setText(latitude);
 
-            String longitude = "" + location.getLongitude();
-            TextView text = (TextView) findViewById(R.id.gpsx);
-            text.setText(longitude);
-
-            String latitude = "" + location.getLatitude();
-            text = (TextView) findViewById(R.id.gpsy);
-            text.setText(latitude);
 
 
-
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d("Latitude", "Status");
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            Log.d("Latitude", "Enable");
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            Log.d("Latitude", "Disable");
-        }
-    };
+//        }
+//
+//        @Override
+//        public void onStatusChanged(String provider, int status, Bundle extras) {
+//            Log.d("Latitude", "Status");
+//        }
+//
+//        @Override
+//        public void onProviderEnabled(String provider) {
+//            Log.d("Latitude", "Enable");
+//        }
+//
+//        @Override
+//        public void onProviderDisabled(String provider) {
+//            Log.d("Latitude", "Disable");
+//        }
+//    };
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 
         Sensor mySensor = sensorEvent.sensor;
         Sensor GSensor = sensorEvent.sensor;
+
+        MyFusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
+            if(location!=null){
+                wayLatitude = location.getLatitude();
+                wayLongitude = location.getLongitude();
+
+                GPSx = (TextView) findViewById(R.id.gpsx);
+                GPSx.setText("" + wayLatitude);
+
+                GPSy = (TextView) findViewById(R.id.gpsy);
+                GPSy.setText("" + wayLongitude);
+
+                GPS_loc = (TextView) findViewById(R.id.city);
+                GPS_loc.setText(String.format(Locale.US,"%s -- %s", wayLatitude, wayLongitude));
+            }
+        });
 
         if (GSensor.getType()==Sensor.TYPE_GYROSCOPE){
             float gx = sensorEvent.values[0];
