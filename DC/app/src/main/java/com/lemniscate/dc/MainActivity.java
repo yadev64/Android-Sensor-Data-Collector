@@ -1,4 +1,4 @@
-package com.example.dc;
+package com.lemniscate.dc;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,11 +30,13 @@ import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         MyFusedLocationClient= LocationServices.getFusedLocationProviderClient(this);
         sensorManagers = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        assert sensorManagers != null;
         senAccelerometor = sensorManagers.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
@@ -101,13 +104,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
     }
 
-    public void FileWriter(String str){
+    public void FileWriters(String str){
         SimpleDateFormat dateObj = new SimpleDateFormat("dd/MM/yyyy");
         Calendar calendar = Calendar.getInstance();
         String date = dateObj.format(calendar.getTime());
 
 
-        File path = new File( this.getExternalFilesDir(null).getAbsolutePath() + "/DC_data");
+        File path = new File( Objects.requireNonNull(this.getExternalFilesDir(null)).getAbsolutePath() + "/DC_data");
 
         if (!path.exists()){
             path.mkdirs();
@@ -120,18 +123,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         try {
             if(!file.exists()){
                 file.createNewFile();
-                FileOutputStream fOut = new FileOutputStream(file);
-                OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
-                outWriter.append("GPS_Lat, GPS_Long, AX, AY, AZ, GX, GY, GZ\n");
-                outWriter.close();
-                fOut.flush();
+                FileOutputStream fOut = new FileOutputStream(file, true);
+//                OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
+//                outWriter.append("GPS_Lat, GPS_Long, AX, AY, AZ, GX, GY, GZ\n");
+//                outWriter.close();
+                fOut.write(" AX, AY, AZ, GPS_Lat, GPS_Long, GX, GY, GZ\n".getBytes());
+//                fOut.flush();
                 fOut.close();
 
+
             }
-            FileOutputStream fOut = new FileOutputStream(file);
-            OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
-            outWriter.append(str + "\n");
-            outWriter.close();
+            FileOutputStream fOut = new FileOutputStream(file, true);
+//            OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
+//            outWriter.append(str);
+//
+//            outWriter.close();
+            fOut.write(str.getBytes());
             fOut.flush();
             fOut.close();
 
@@ -415,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 text.setText(sZ);
 
                 fileString = fileString + sX + ", " + sY + ", " + sZ + "\n";
-                FileWriter(fileString);
+                FileWriters(fileString);
                 }
             }
         }
