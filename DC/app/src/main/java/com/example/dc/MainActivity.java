@@ -17,6 +17,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ProgressBar;
@@ -26,6 +28,12 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 
@@ -37,14 +45,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView GPSx;
     private TextView GPSy;
     private TextView GPS_loc;
+    private FusedLocationProviderClient MyFusedLocationClient;
 
     private long lastUpdate = 0;
     private long lastUpdate_gyro = 0;
-    private FusedLocationProviderClient MyFusedLocationClient;
     private int locationRequestCode=1000;
     private double wayLatitude = 0.0, wayLongitude = 0.0;
     public int i=0;
     public int c=0;
+    public String fileString = new String();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
 
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, locationRequestCode);
         }
         else {
-            Toast.makeText(getApplicationContext(), "Location Permission Granted", Toast.LENGTH_SHORT);
+            Toast T = Toast.makeText(getApplicationContext(), "Location & file access Permission Granted", Toast.LENGTH_SHORT);
+            T.show();
         }
 
         ChangeTheme();
@@ -90,6 +99,57 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 onPause();
             }
         });
+    }
+
+    public void FileWriter(String str){
+        SimpleDateFormat dateObj = new SimpleDateFormat("dd/MM/yyyy");
+        Calendar calendar = Calendar.getInstance();
+        String date = dateObj.format(calendar.getTime());
+
+
+        File path = new File( this.getExternalFilesDir(null).getAbsolutePath() + "/DC_data");
+
+        if (!path.exists()){
+            path.mkdirs();
+            TextView txt = (TextView) findViewById(R.id.city);
+            txt.setText(date);
+        }
+
+        final File file = new File(path, "DC_data.csv");
+
+        try {
+            if(!file.exists()){
+                file.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(file);
+                OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
+                outWriter.append("GPS_Lat, GPS_Long, AX, AY, AZ, GX, GY, GZ\n");
+                outWriter.close();
+                fOut.flush();
+                fOut.close();
+
+            }
+            FileOutputStream fOut = new FileOutputStream(file);
+            OutputStreamWriter outWriter = new OutputStreamWriter(fOut);
+            outWriter.append(str + "\n");
+            outWriter.close();
+            fOut.flush();
+            fOut.close();
+
+        } catch (IOException e){
+            Log.e("Exception", "File write failed");
+        }
+
+        fileString = "";
+
+
+//        try {
+//            File file = new File(date + ".csv");
+//            if (!file.exists()){
+//                file.createNewFile();
+//            }
+//        }catch (IOException e){
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -121,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                 GPSy = (TextView) findViewById(R.id.gpsy);
                 GPSy.setText("" + wayLongitude);
+
+                fileString = fileString + wayLatitude + ", " + wayLongitude + ", ";
 
                 GPS_loc = (TextView) findViewById(R.id.city);
                 GPS_loc.setText(String.format(Locale.US,"%s -- %s", wayLatitude, wayLongitude));
@@ -283,13 +345,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    public void startAnimate(){
-        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar);
-        ObjectAnimator pbAnim = ObjectAnimator.ofFloat(pb, "progress", 100.0F, 0.0F);
-        pbAnim.setDuration(300000);
-        pbAnim.setInterpolator(new LinearInterpolator());
-        pbAnim.start();
-    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -325,6 +380,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     String sZ = Float.toString(gz);
                     text = (TextView) findViewById(R.id.gz);
                     text.setText(sZ);
+
+                    fileString = fileString + sX + ", " + sY + ", " + sZ + ", ";
                 }
             }
         }
@@ -347,7 +404,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
                     ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
                     int progress = (int) (((-1 * x) + 10) * 10000);
-                    startAnimate();
                     progressBar.setProgress(progress);
 
                 String sY = Float.toString(y);
@@ -357,6 +413,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 String sZ = Float.toString(z);
                 text = (TextView) findViewById(R.id.az);
                 text.setText(sZ);
+
+                fileString = fileString + sX + ", " + sY + ", " + sZ + "\n";
+                FileWriter(fileString);
                 }
             }
         }
@@ -367,5 +426,3 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 }
-
-
