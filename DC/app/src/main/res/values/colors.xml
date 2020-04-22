@@ -3,4 +3,14 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="dark_mode_Text_Main">#2196f3</color>
+    <color name="dark_mode_text_sub">#ffffff</color>
+    <color name="dark_mode_card">#232323</color>
+    <color name="dark_mode_bg">#000000</color>
+
+    <color name="lite_mode_Text_main">#000000</color>
+    <color name="lite_mode_Text_sub">#2196f3</color>
+    <color name="lite_mode_card">#FFFFFF</color>
+    <color name="lite_mode_bg">#FFFFFF</color>
 </resources>

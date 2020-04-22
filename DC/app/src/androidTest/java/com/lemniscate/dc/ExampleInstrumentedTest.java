@@ -1,4 +1,4 @@
-package com.example.dc;
+package com.lemniscate.dc;
 
 import android.content.Context;
 
