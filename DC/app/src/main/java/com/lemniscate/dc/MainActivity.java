@@ -42,6 +42,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager sensorManagers;
+    private SensorManager sensorManagerG;
     private Sensor senAccelerometor;
     private Sensor senGyroscope;
     private TextView GPSx;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private double wayLatitude = 0.0, wayLongitude = 0.0;
     public int i=0;
     public int c=0;
-    public String fileString = new String();
+    public String fileString = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,9 +66,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         MyFusedLocationClient= LocationServices.getFusedLocationProviderClient(this);
         sensorManagers = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensorManagerG = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         assert sensorManagers != null;
         senAccelerometor = sensorManagers.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        senGyroscope = sensorManagers.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        senGyroscope = sensorManagerG.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
