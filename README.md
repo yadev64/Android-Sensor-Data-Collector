@@ -4,3 +4,6 @@ Which is too be used for accident detection.
 
 
 AutoBlock-IoT
+Things to be done
+Data stoing to be done with IPFS
+backend Ethereum 
