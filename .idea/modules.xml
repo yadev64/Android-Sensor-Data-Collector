@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SensorMonitor-Data-Collector-.iml" filepath="$PROJECT_DIR$/.idea/SensorMonitor-Data-Collector-.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SensorMonitor-Data-Collector-.iml" filepath="$PROJECT_DIR$/.idea/modules/SensorMonitor-Data-Collector-.iml" />
     </modules>
   </component>
 </project>
