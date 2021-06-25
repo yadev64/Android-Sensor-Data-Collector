@@ -20,7 +20,13 @@ To use/modify the app:
 1. Clone the repo to your local machine
 2. Open Android Studio and open this project
 
-Now, you can edit the code and run it from here. To run the project, just hit run on the specified device.
+Now, you can edit the code and run it from here.
+To run the project, just hit run on the specified device.
+
+### How to use?
+
+Once you open the app, just click the toggle button at the bottom. It will start the data capture process and write all the data into a CSV file.
+To get the CSV file, just go to your local storage of your android device > Android > Data, in here, select the folder for DC application. In there, you'll find the CSV file.
 
 ### Known Bugs
 
